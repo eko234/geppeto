@@ -2,7 +2,7 @@
 Makes your editor a "real boy", I think it was the fairy tho, but idfc.
 
 ## demo
-https://asciinema.org/a/ZlmzWXqY77agtaEfW03sGYoEZ
+[![demo](https://asciinema.org/a/ZlmzWXqY77agtaEfW03sGYoEZ.svg)](https://asciinema.org/a/ZlmzWXqY77agtaEfW03sGYoEZ?autoplay=1)
 
 ## Installation
 Add this to your kakrc
