@@ -1,54 +1,68 @@
-declare-option str geppetochatinfifo
-declare-option str geppetochatoutfifo
-declare-option str geppetolockfile "/tmp/kakgeppeto.lock"
-declare-option bool geppetoownslock
+declare-option str geppetotempprefixorsomething /tmp/kakgeppeto
 
-define-command opengpt %{
-  eval -try-client tools %{
-    edit -fifo %opt{geppetochatoutfifo} chat
+declare-option -hidden str geppetochatoutfifo
+declare-option -hidden str geppetochatinfifo
+
+declare-option str geppetolockfile /tmp/kakgeppeto.lock
+declare-option str geppetoprogram geppeto
+declare-option bool geppetostarted false
+
+define-command opengpt -hidden -override %{
+  try %{
+    buffer chatgeppeto
+  } catch %{
+    eval -try-client tools %{
+      edit -fifo %opt{geppetochatoutfifo} chatgeppeto
+    }
   }
 }
 
 define-command gpt -override -params 0.. %{
-  evaluate-commands %sh{
+  start-geppeto
+
+  nop %sh{
     if [ $(($(printf %s "${kak_selection}" | wc -m))) -gt 1 ]; then
       echo "$@ " "$(printf '%s' "${kak_selection}" | tr '\n' ' ')" > $kak_opt_geppetochatinfifo
     else
       echo "$@" > $kak_opt_geppetochatinfifo
     fi
   }
-  eval -try-client tools %{
-    buffer chat
+
+  opengpt
+}
+
+define-command geppetoreifywith -override -params 1 %{
+  evaluate-commands %sh{
+    printf %s "define-command start-geppeto -override -params 0 %{
+      eval %sh{
+        if [ \"\$kak_opt_geppetostarted\" = false ]; then
+          infifo=\$(mktemp -u \"\${kak_opt_geppetotempprefixorsomething}XXXXXXXX\")
+          mkfifo \$infifo
+          echo \"set-option global geppetochatinfifo \$infifo\"
+          outfifo=\$(mktemp -u \"\${kak_opt_geppetotempprefixorsomething}XXXXXXXX\")
+          mkfifo \$outfifo
+          echo \"set-option global geppetochatoutfifo \$outfifo\"
+          (eval OPENAI_API_KEY=$1 \$kak_opt_geppetoprogram \$infifo \$outfifo 2>&1 & ) > /dev/null 2>&1 < /dev/null
+          echo \"set-option global geppetostarted true\"
+        fi
+      }
+    }"
   }
 }
 
-define-command start-geppeto %{
-  nop %sh{
-    if [ ! -p "$kak_opt_geppetochatinfifo" ]; then
-        mkfifo "$kak_opt_geppetochatinfifo"
-    fi
+# define-command start-geppeto -override -params 0..1 %{
+#   eval %sh{
+#     if [ "$kak_opt_geppetostarted" = false ]; then
+#       infifo=$(mktemp -u "${kak_opt_geppetotempprefixorsomething}XXXXXXXX")
+#       mkfifo $infifo
+#       echo "set-option global geppetochatinfifo $infifo"
 
-    if [ ! -p "$kak_opt_geppetochatoutfifo" ]; then
-        mkfifo "$kak_opt_geppetochatoutfifo"
-    fi
+#       outfifo=$(mktemp -u "${kak_opt_geppetotempprefixorsomething}XXXXXXXX")
+#       mkfifo $outfifo
+#       echo "set-option global geppetochatoutfifo $outfifo"
 
-    if [ -f "$kak_opt_geppetolockfile" ]; then
-        echo "The program is already running."
-        exit 1
-    else
-        # Create kak_opt_geppetolockfile
-        touch "$kak_opt_geppetolockfile"
-        OPENAI_API_KEY=<YOUR API KEY> geppeto $kak_opt_geppetochatinfifo $kak_opt_geppetochatoutfifo &
-        rm "$kak_opt_geppetolockfile"
-    fi
-  }
-}
-
-
-# This will kill all instances of geppeto in your machine, if you are using it outside of kakoune
-# this might not always be a good idea, I haven't found a better way to handle this
-define-command kill-geppeto-smh %{
-    nop %sh{
-      pgrep geppeto | xargs kill -9
-    }
-}
+#       ( eval OPENAI_API_KEY=$1 $kak_opt_geppetoprogram $infifo $outfifo 2>&1 & ) > /dev/null 2>&1 < /dev/null
+#       echo "set-option global geppetostarted true"
+#     fi
+#   }
+# }
