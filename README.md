@@ -36,7 +36,8 @@ you can use `gpt`: to write to input fifo to interact with the chat, this functi
 that
 
 ## Notes
-you can also use the option `geppetoprogram` to change it to something different in case you are crazy or have problems installing it.
+you can also use the option `geppetoprogram` to change it to something different in case you are crazy or have problems installing it, for example a docker script or
+directly running it with go like `go run /path/to/gepetto/main.go`.
 
 ## Caveats
 right now I can't think of a way to gracefully handle the processes, you will only spawn a geppeto process once per kakoune session only when you use the gpt command, after that
