@@ -16,7 +16,7 @@ key from their nasty plugins.
 I like to map user-i to ": gpt ", but you do whatever
 ``` kak
 plug "eko234/geppeto" config %{
-  geppetoreifywith <API KEY, yes I leaked mine but I just changed it>
+  geppetoreifywith <API KEY, yes I leaked mine writing this plugin>
   map global user i ": gpt "
 }
 ```
