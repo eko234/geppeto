@@ -22,10 +22,8 @@ plug "eko234/geppeto" config %{
 ```
 
 ## Usage
-you can use
-  - `opengpt`: to connect to the output fifo
-  - `gpt`: to write to input fifo to interact with the chat, this function will take your prompt, and if you have a selection bigger than 1, it will append it to your prompt to ease the interaction with the chat
-
+you can use `gpt`: to write to input fifo to interact with the chat, this function will take your prompt, and if you have a selection bigger than 1, it will append it to your prompt to ease the interaction with the chat, it will get you to the chat buffer if you are using a single client, if you have a toolsclient associated with your session it will try to use
+that
 
 ## Notes
 you can also use the option `geppetoprogram` to change it to something different in case you are crazy or have problems installing it.
