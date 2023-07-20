@@ -31,7 +31,7 @@ define-command gpt -override -params 0.. %{
   opengpt
 }
 
-define-command geppetoreifywith -override -params 1 %{
+define-command geppetoreifywith -override -params 1..2 %{
   evaluate-commands %sh{
     printf %s "define-command start-geppeto -override -params 0 %{
       eval %sh{
@@ -42,7 +42,7 @@ define-command geppetoreifywith -override -params 1 %{
           outfifo=\$(mktemp -u \"\${kak_opt_geppetotempprefixorsomething}XXXXXXXX\")
           mkfifo \$outfifo
           echo \"set-option global geppetochatoutfifo \$outfifo\"
-          (eval OPENAI_API_KEY=$1 \$kak_opt_geppetoprogram \$infifo \$outfifo 2>&1 & ) > /dev/null 2>&1 < /dev/null
+          (eval OPENAI_API_KEY=$1 GEPPETO_DEBUG=$2 \$kak_opt_geppetoprogram \$infifo \$outfifo 2>&1 & ) > /dev/null 2>&1 < /dev/null
           echo \"set-option global geppetostarted true\"
         fi
       }

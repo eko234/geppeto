@@ -8,14 +8,16 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	openai "github.com/sashabaranov/go-openai"
 )
 
 func main() {
 	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
-
 	rawMessageCap := os.Getenv("MESSAGE_CAP")
+	geppetoDebug := os.Getenv("GEPPETO_DEBUG")
+	debug := strings.Contains(geppetoDebug, "yes")
 
 	if rawMessageCap == "" {
 		rawMessageCap = "50"
@@ -58,7 +60,12 @@ func main() {
 		})
 		stream, err := client.CreateChatCompletionStream(context.Background(), req)
 		if err != nil {
-			fmt.Printf("ChatCompletion error: %v\n", err)
+			msg := fmt.Sprintf("ChatCompletion error: %v", err)
+			if debug {
+				outputFile.WriteString(msg)
+				outputFile.WriteString("\n")
+			}
+			fmt.Printf("%s\n", msg)
 			continue
 		}
 
@@ -72,7 +79,12 @@ func main() {
 					outputFile.WriteString("\n")
 					break BUFFERING
 				}
-				fmt.Printf("ChatCompletion error: %v\n", err)
+				msg := fmt.Sprintf("ChatCompletion error: %v", err)
+				if debug {
+					outputFile.WriteString(msg)
+					outputFile.WriteString("\n")
+				}
+				fmt.Printf("%s\n", msg)
 			}
 			outputFile.WriteString(fmt.Sprintf("%s", resp.Choices[0].Delta.Content))
 			msg.Content = msg.Content + resp.Choices[0].Delta.Content
