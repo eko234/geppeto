@@ -9,9 +9,7 @@ declare-option bool geppetostarted false
 
 define-command opengpt -hidden -override %{
   try %{
-    eval -try-client tools %{
-      buffer chatgeppeto
-    }
+    buffer chatgeppeto
   } catch %{
     eval -try-client tools %{
       edit -fifo %opt{geppetochatoutfifo} chatgeppeto
