@@ -92,7 +92,6 @@ func main() {
 				}
 				fmt.Printf("%s\n", msg)
 			}
-			outputFile.WriteString(fmt.Sprintf("ALWAYS REMEMBER THAT THIS SHIT SPITS GARBAGE CODE\n"))
 			outputFile.WriteString(fmt.Sprintf("%s", resp.Choices[0].Delta.Content))
 			msg.Content = msg.Content + resp.Choices[0].Delta.Content
 		}
