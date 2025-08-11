@@ -1,6 +1,8 @@
 # geppeto
 Makes your editor a "real boy", I think it was the fairy tho, but idfc.
 
+NEWS!: this thing now uses GPT5, remember to verify your organization to use the model.
+
 ## demo
 [![demo](https://asciinema.org/a/ZlmzWXqY77agtaEfW03sGYoEZ.svg)](https://asciinema.org/a/ZlmzWXqY77agtaEfW03sGYoEZ?autoplay=1)
 
