@@ -14,6 +14,12 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			debf(fmt.Sprintf("SOMETHING GOT FUCKED UP %v", r))
+		}
+	}()
+
 	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 	rawMessageCap := os.Getenv("MESSAGE_CAP")
 	geppetoDebug := os.Getenv("GEPPETO_DEBUG")
@@ -29,7 +35,7 @@ func main() {
 	}
 	req := openai.ChatCompletionRequest{
 		Stream: true,
-		Model:  openai.GPT3Dot5Turbo,
+		Model:  openai.GPT5,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
@@ -86,6 +92,7 @@ func main() {
 				}
 				fmt.Printf("%s\n", msg)
 			}
+			outputFile.WriteString(fmt.Sprintf("ALWAYS REMEMBER THAT THIS SHIT SPITS GARBAGE CODE\n"))
 			outputFile.WriteString(fmt.Sprintf("%s", resp.Choices[0].Delta.Content))
 			msg.Content = msg.Content + resp.Choices[0].Delta.Content
 		}
@@ -99,4 +106,19 @@ func main() {
 
 		req.Messages = req.Messages[ran:]
 	}
+}
+
+var dbgf *os.File
+
+func init() {
+	var err error
+	dbgf, err = os.CreateTemp(os.TempDir(), "gepeto_debugardo")
+	if err != nil {
+		panic(err)
+	}
+	debf("DEBUG INIT OK")
+}
+
+func debf(v string) {
+	dbgf.WriteString(fmt.Sprintf("%s\n", v))
 }
